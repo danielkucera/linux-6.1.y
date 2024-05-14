@@ -1474,6 +1474,24 @@ retry:
 		if (err)
 			goto free_card;
 	}
+	
+        u32 card_status;
+
+        err = mmc_send_status(card, &card_status);
+        if (err){
+                pr_warn("unable to get card status\n");
+                goto free_card;
+        }
+
+        if (card_status & R1_CARD_IS_LOCKED){
+                pr_warn("card is locked\n");
+
+                //card->locked = 1;
+                //err = -EINVAL;
+                //goto free_card;       
+                //mmc_set_bus_width(host, MMC_BUS_WIDTH_1);
+                goto cont;
+        }
 
 	err = mmc_sd_setup_card(host, card, oldcard != NULL);
 	if (err)
